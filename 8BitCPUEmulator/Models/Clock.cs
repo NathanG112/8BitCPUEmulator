@@ -113,6 +113,8 @@ namespace _8BitCPUEmulator.Models
                     cpu.MEM[cpu.REG.Read((byte)((inst & 0x0F00) >> 8)) + (byte)((inst & 0x000F) - 8)] = cpu.REG.Read((byte)((inst & 0x00F0) >> 4));
                     break;
             }
+
+            cpu.PC++;
         }
     }
 }

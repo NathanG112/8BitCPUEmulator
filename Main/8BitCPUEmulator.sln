@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "8BitCPUEmulator_Tester", "8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "8BitCPUEmulator", "..\8BitCPUEmulator\8BitCPUEmulator.csproj", "{643F9770-5A0F-4E90-A789-9915E8E66B3F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "8BitCPUROMAssembler", "..\8BitCPUROMAssembler\8BitCPUROMAssembler.csproj", "{D0401B1D-0237-445E-BC6D-1D8C728CB114}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{643F9770-5A0F-4E90-A789-9915E8E66B3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{643F9770-5A0F-4E90-A789-9915E8E66B3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{643F9770-5A0F-4E90-A789-9915E8E66B3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0401B1D-0237-445E-BC6D-1D8C728CB114}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0401B1D-0237-445E-BC6D-1D8C728CB114}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0401B1D-0237-445E-BC6D-1D8C728CB114}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0401B1D-0237-445E-BC6D-1D8C728CB114}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

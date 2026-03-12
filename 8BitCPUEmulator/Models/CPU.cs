@@ -31,8 +31,6 @@ namespace _8BitCPUEmulator.Models
 
         public CPU(FileStream binFile)
         {
-            throw new NotImplementedException();
-
             PC = 0;
             _ALU = new ALU();
             REG = new RegisterFile();

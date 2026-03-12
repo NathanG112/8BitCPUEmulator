@@ -3,21 +3,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
 namespace _8BitCPUEmulator.Models
 {
-    internal class Clock : IClock
+
+    public class Clock : IClock
     {
-        private System.Timers.Timer CLK = new System.Timers.Timer(20);
+        private System.Timers.Timer CLK;
+        private bool PCJump;
         CPU _CPU { get; set; }
 
         public Clock(CPU cpu) 
         { 
             _CPU = cpu;
+            PCJump = false;
 
+            CLK = new System.Timers.Timer(20);
             CLK.Elapsed += Pulse;
             CLK.AutoReset = true;
             CLK.Enabled = true;
@@ -27,6 +32,7 @@ namespace _8BitCPUEmulator.Models
 
         public void Update(CPU cpu)
         {
+            Console.WriteLine("Pulse");
             ushort inst = cpu.ROM[cpu.PC];
 
             switch((byte)(inst >> 12))
@@ -79,26 +85,28 @@ namespace _8BitCPUEmulator.Models
                     switch((byte)((inst & 0x0C00) >> 10)) {
                         //Zero Flag True, ==
                         case 0b00:
-                            if (cpu._ALU.Zero) cpu.PC = (ushort)((inst & 0x03FF) - 1);
+                            if (cpu._ALU.Zero) cpu.PC = (ushort)((inst & 0x03FF));
                             break;
                         //Zero Flag False, !=
                         case 0b01:
-                            if (!cpu._ALU.Zero) cpu.PC = (ushort)((inst & 0x03FF) - 1);
+                            if (!cpu._ALU.Zero) cpu.PC = (ushort)((inst & 0x03FF));
                             break;
                         //Carry Flag True, >=
                         case 0b10:
-                            if (cpu._ALU.Carry) cpu.PC = (ushort)((inst & 0x03FF) - 1);
+                            if (cpu._ALU.Carry) cpu.PC = (ushort)((inst & 0x03FF));
                             break;
                         //Carry Flag False, <
                         case 0b11:
-                            if (!cpu._ALU.Carry) cpu.PC = (ushort)((inst & 0x03FF) - 1);
+                            if (!cpu._ALU.Carry) cpu.PC = (ushort)((inst & 0x03FF));
                             break;
                     }
+                    PCJump = true;
                     break;
                 //CAL
                 case 0b1100:
                     cpu.STK.Push(cpu.PC);
-                    cpu.PC = (ushort)((inst & 0x03FF) - 1);
+                    cpu.PC = (ushort)((inst & 0x03FF));
+                    PCJump = true;
                     break;
                 //RET
                 case 0b1101:
@@ -114,7 +122,10 @@ namespace _8BitCPUEmulator.Models
                     break;
             }
 
-            cpu.PC++;
+            if (!PCJump) cpu.PC++;
+            else PCJump = false;
         }
+
+        public bool ClockEnabled() => CLK.Enabled;
     }
 }

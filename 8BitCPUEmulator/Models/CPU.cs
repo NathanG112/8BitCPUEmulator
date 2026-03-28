@@ -9,7 +9,7 @@ namespace _8BitCPUEmulator.Models
 {
     public class CPU
     {
-        public IClock CLK { get; private set; }
+        public Clock CLK { get; private set; }
         public ushort PC { get; set; }
         public IALU _ALU { get; private set; }
         public IRegisterFile REG { get; private set; }

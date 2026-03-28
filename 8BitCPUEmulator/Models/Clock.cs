@@ -13,7 +13,8 @@ namespace _8BitCPUEmulator.Models
 
     public class Clock : IClock
     {
-        private System.Timers.Timer CLK;
+        private System.Threading.Timer CLK;
+        private ManualResetEventSlim mainThreadWaiter;
         private bool PCJump;
         CPU _CPU { get; set; }
 
@@ -21,14 +22,25 @@ namespace _8BitCPUEmulator.Models
         { 
             _CPU = cpu;
             PCJump = false;
-
-            CLK = new System.Timers.Timer(20);
-            CLK.Elapsed += Pulse;
-            CLK.AutoReset = true;
-            CLK.Enabled = true;
+            CLK = new System.Threading.Timer(Pulse, null, 250, Timeout.Infinite);
+            mainThreadWaiter = new ManualResetEventSlim(false);
+            mainThreadWaiter.Wait();
         }
 
-        private void Pulse(object source, ElapsedEventArgs e) => Update(_CPU);
+        public void Pulse(object? info)
+        {
+            Console.WriteLine(CurrState());
+            Update(_CPU);
+            try
+            {
+                CLK.Change(250, Timeout.Infinite);
+            }
+            catch (Exception ex) 
+            {
+                Console.WriteLine(ex.Message);
+            }
+            
+        }
 
         public void Update(CPU cpu)
         {
@@ -42,7 +54,9 @@ namespace _8BitCPUEmulator.Models
                     break;
                 //END
                 case 0b0001:
-                    CLK.Enabled = false;
+                    CLK.Dispose();
+                    mainThreadWaiter.Set();
+                    mainThreadWaiter.Dispose();
                     break;
                 //ADD
                 case 0b0010:
@@ -85,22 +99,37 @@ namespace _8BitCPUEmulator.Models
                     switch((byte)((inst & 0x0C00) >> 10)) {
                         //Zero Flag True, ==
                         case 0b00:
-                            if (cpu._ALU.Zero) cpu.PC = (ushort)((inst & 0x03FF));
+                            if (cpu._ALU.Zero)
+                            {
+                                cpu.PC = (ushort)((inst & 0x03FF));
+                                PCJump = true;
+                            }
                             break;
                         //Zero Flag False, !=
                         case 0b01:
-                            if (!cpu._ALU.Zero) cpu.PC = (ushort)((inst & 0x03FF));
+                            if (!cpu._ALU.Zero)
+                            {
+                                cpu.PC = (ushort)((inst & 0x03FF));
+                                PCJump = true;
+                            }
                             break;
                         //Carry Flag True, >=
                         case 0b10:
-                            if (cpu._ALU.Carry) cpu.PC = (ushort)((inst & 0x03FF));
+                            if (cpu._ALU.Carry)
+                            {
+                                cpu.PC = (ushort)((inst & 0x03FF));
+                                PCJump = true;
+                            }
                             break;
                         //Carry Flag False, <
                         case 0b11:
-                            if (!cpu._ALU.Carry) cpu.PC = (ushort)((inst & 0x03FF));
+                            if (!cpu._ALU.Carry) 
+                            {
+                                cpu.PC = (ushort)((inst & 0x03FF));
+                                PCJump = true;
+                            }
                             break;
                     }
-                    PCJump = true;
                     break;
                 //CAL
                 case 0b1100:
@@ -126,6 +155,9 @@ namespace _8BitCPUEmulator.Models
             else PCJump = false;
         }
 
-        public bool ClockEnabled() => CLK.Enabled;
+        private string CurrState()
+        {
+            return $"PC: {_CPU.PC}\nREG1: {_CPU.REG.Read(1)}\nREG2: {_CPU.REG.Read(2)}\nREG3: {_CPU.REG.Read(3)}\n";
+        }
     }
 }

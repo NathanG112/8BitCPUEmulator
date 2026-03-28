@@ -18,9 +18,14 @@ namespace _8BitCPUEmulator
             } while (!validFile);
 
             CPU cpu = new CPU(File.OpenRead(path));
-
-
+            var clk = cpu.CLK;
             Console.WriteLine("cpu initialized");
+
+
+
+            Console.WriteLine("cpu finished");
+
+            
         }
     }
 }
